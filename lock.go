@@ -104,11 +104,12 @@ func (l *RedisLock) Unlock(ctx context.Context) error {
 func (l *RedisLock) keepAlive(ctx context.Context) {
 	ticker := time.NewTicker(l.ttl / 2) // 每 50% TTL 续期
 	defer ticker.Stop()
+	lockKey := fmt.Sprintf("%s:%s", l.key, l.value)
 
 	for {
 		select {
 		case <-ticker.C:
-			l.client.Expire(ctx, l.key, l.ttl)
+			l.client.Expire(ctx, lockKey, l.ttl)
 		case <-l.unlockCh:
 			return
 		}
