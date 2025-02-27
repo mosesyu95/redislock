@@ -23,6 +23,9 @@ type RedisLock struct {
 
 // NewRedisLock 创建一个新的 Redis 分布式锁实例
 func NewRedisLock(key, value string, keepAlive bool, ttl time.Duration) *RedisLock {
+	if ttl <= 3*time.Second {
+		panic("redisLock ttl must be greater than 3 seconds")
+	}
 	if !strings.HasPrefix(key, PreString) {
 		key = PreString + key
 	}
